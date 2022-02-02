@@ -505,6 +505,8 @@ dependencies = [
 name = "pulse-rs"
 version = "0.1.0"
 dependencies = [
+ "gdk",
+ "gdk-pixbuf",
  "gtk",
  "libc",
  "pango",
