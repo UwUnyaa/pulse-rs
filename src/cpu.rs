@@ -47,6 +47,19 @@ pub fn get_cpu_count() -> u32 {
     return count;
 }
 
+pub fn get_cpu_max_frequency() -> u32 {
+    let contents = fs::read_to_string("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq")
+        .expect("Cannot read cpu frequency file");
+
+    let line = contents.lines().next();
+
+    if let Some(frequency) = line {
+        return frequency.parse::<u32>().unwrap();
+    } else {
+        panic!("Malformed frequency");
+    }
+}
+
 pub fn parse_cpuinfo() -> HashMap<String, String> {
     let mut map = HashMap::new();
 

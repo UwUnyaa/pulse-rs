@@ -1,6 +1,7 @@
 // use gtk::prelude::*;
 // use gtk::{Application, ApplicationWindow};
 
+pub mod badge;
 pub mod cpu;
 pub mod system;
 
@@ -36,7 +37,7 @@ fn main() {
         // dbg!(&cpu_infos[i].curr_stat);
     }
 
-    dbg!(cpu::parse_cpuinfo());
+    dbg!(badge::normalize_cpu_frequency(cpu::get_cpu_max_frequency()));
 
     // app.run();
 }
