@@ -33,7 +33,7 @@ fn main() {
     for i in 0..cpu_infos.len() {
         // println!("CPU{} enabled: {}", i, cpu_infos[i].enabled);
         cpu::get_cpu_usage(&mut cpu_infos[i]);
-        // println!("CPU{} usage: {}", i, cpu_infos[i].usage);
+        println!("CPU{} usage: {}", i, cpu_infos[i].usage);
         // dbg!(&cpu_infos[i].curr_stat);
     }
 

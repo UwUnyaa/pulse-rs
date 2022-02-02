@@ -108,7 +108,19 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
         let curr_stat = &mut cpu_info.curr_stat;
         let line = lines.next();
 
-        let results = scanf!(
+        (
+            _,
+            curr_stat.user,
+            curr_stat.nice,
+            curr_stat.system,
+            curr_stat.idle,
+            curr_stat.iowait,
+            curr_stat.irq,
+            curr_stat.softirq,
+            curr_stat.steal,
+            curr_stat.guest,
+            curr_stat.guest_nice,
+        ) = scanf!(
             line.unwrap(),
             "cpu{} {} {} {} {} {} {} {} {} {} {}",
             u32,
@@ -122,21 +134,8 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
             u32,
             u32,
             u32,
-        );
-
-        (
-            _,
-            curr_stat.user,
-            curr_stat.nice,
-            curr_stat.system,
-            curr_stat.idle,
-            curr_stat.iowait,
-            curr_stat.irq,
-            curr_stat.softirq,
-            curr_stat.steal,
-            curr_stat.guest,
-            curr_stat.guest_nice,
-        ) = results.unwrap();
+        )
+        .unwrap();
     }
 }
 
