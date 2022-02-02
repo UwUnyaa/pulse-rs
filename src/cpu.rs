@@ -140,6 +140,10 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
 }
 
 pub fn get_cpu_usage(cpu_info: &mut CPUInfo) -> f64 {
+    if !cpu_info.enabled {
+        return 0.0;
+    }
+
     let prev = &cpu_info.prev_stat;
     let curr = &cpu_info.curr_stat;
 
