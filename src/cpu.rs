@@ -124,10 +124,8 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
             u32,
         );
 
-        let _first_field;
-
         (
-            _first_field,
+            _,
             curr_stat.user,
             curr_stat.nice,
             curr_stat.system,
