@@ -1,6 +1,6 @@
 use gtk;
 use gtk::prelude::{BoxExt, ContainerExt, ProgressBarExt, ToggleButtonExt, WidgetExt};
-use gtk::{Align, ApplicationWindow, Box, Image, Orientation, ProgressBar, ToggleButton};
+use gtk::{Align, ApplicationWindow, Box, Orientation, ProgressBar, ToggleButton};
 
 use crate::badge;
 use crate::cpu;
@@ -17,7 +17,7 @@ pub fn init_interface(window: &ApplicationWindow, cpu_infos: Vec<cpu::CPUInfo>) 
 
     window.add(&top_hbox);
 
-    let image = Image::from_pixbuf(badge::create_badge_image().as_ref());
+    let image = badge::create_badge_image();
     image.set_halign(Align::Start);
     image.set_valign(Align::Start);
 

@@ -7,8 +7,11 @@ edition = "2021"
 
 [dependencies]
 gtk = "0.15.3"
-gdk = "0.15.2"
-gdk-pixbuf = "0.15.4"
 pango = "0.15.2"
+pangocairo = "0.15.1"
 libc = "0.2.116"
 sscanf = "0.1.4"
+
+[dependencies.cairo-rs]
+version = "0.15.1"
+features = ["png"]
