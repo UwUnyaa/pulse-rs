@@ -1,5 +1,7 @@
+use gtk::glib::source;
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow};
+use std::time::Duration;
 
 pub mod badge;
 pub mod cpu;
@@ -7,8 +9,7 @@ pub mod interface;
 pub mod system;
 
 fn main() {
-    let app = Application::builder()
-        .build();
+    let app = Application::builder().build();
 
     app.connect_activate(|app| {
         // create the window
@@ -30,7 +31,13 @@ fn main() {
             cpu::get_cpu_usage(&mut cpu_infos[i]);
         }
 
-        interface::init_interface(&window, cpu_infos);
+        let mut interfaces = interface::init_interface(&window, &cpu_infos);
+
+        source::timeout_add_local(Duration::new(1, 0), move || {
+            interface::update_usage_handler(&mut interfaces, &mut cpu_infos);
+
+            return source::Continue(true);
+        });
 
         // show the window
         window.show_all();
