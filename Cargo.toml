@@ -11,6 +11,7 @@ pango = "0.15.2"
 pangocairo = "0.15.1"
 libc = "0.2.116"
 sscanf = "0.1.4"
+lazy_static = "1.4.0"
 
 [dependencies.cairo-rs]
 version = "0.15.1"
