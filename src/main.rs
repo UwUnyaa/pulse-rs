@@ -12,13 +12,10 @@ fn main() {
     let app = Application::builder().build();
 
     app.connect_activate(|app| {
-        // create the window
-        // FIXME: move constants to some sort of config
         let window = ApplicationWindow::builder()
             .application(app)
             .title("Pulse")
             .resizable(false)
-            // .border_size(4)
             .build();
 
         let cpu_count = cpu::get_cpu_count();
@@ -39,7 +36,6 @@ fn main() {
             return glib::ControlFlow::Continue;
         });
 
-        // show the window
         window.present();
     });
 
