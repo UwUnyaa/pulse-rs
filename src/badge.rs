@@ -2,41 +2,40 @@ use crate::cpu;
 
 use std::collections::HashMap;
 
-use gtk::cairo::{Context as CairoContext, ImageSurface};
-use gtk::prelude::WidgetExt;
-use gtk::{Image, Inhibit};
-use pango;
-use pango::{Alignment, FontDescription};
-use pangocairo;
+use gtk4::cairo::{Context as CairoContext, ImageSurface};
+use gtk4::pango::{Alignment, FontDescription};
+use gtk4::prelude::*;
+use gtk4::DrawingArea;
+use pangocairo::functions::{create_layout, show_layout, update_layout};
 use std::fs::File;
 
 const CPU_FREQUENCY_POWERS: [char; 4] = ['k', 'M', 'G', 'T'];
 const BADGE_SIZE: i32 = 128;
 
 fn draw_badge_text(cr: &CairoContext, label: &String, ypos: f64, font_size: i32) {
-    let layout = pangocairo::create_layout(&cr).unwrap();
+    let layout = create_layout(cr);
     layout.set_text(&label);
     layout.set_font_description(Some(&FontDescription::from_string(&format!(
         "sans {}",
         font_size
     ))));
     layout.set_alignment(Alignment::Center);
-    layout.set_width(pango::units_from_double((BADGE_SIZE - 16).into()));
-    pangocairo::update_layout(cr, &layout);
+    layout.set_width(gtk4::pango::units_from_double((BADGE_SIZE - 16).into()));
+    update_layout(cr, &layout);
     cr.set_source_rgb(0.89453125, 0.89453125, 0.89453125);
     cr.move_to(8.0, ypos);
-    pangocairo::show_layout(cr, &layout);
+    show_layout(cr, &layout);
 }
 
-pub fn create_badge_image() -> Image {
-    let image = Image::builder()
+pub fn create_badge_image() -> DrawingArea {
+    let drawing_area = DrawingArea::builder()
         .width_request(BADGE_SIZE)
         .height_request(BADGE_SIZE)
         .build();
 
     let cpu_stats = cpu::parse_cpuinfo();
 
-    image.connect_draw(move |_image, cr| {
+    drawing_area.set_draw_func(move |_area, cr, _width, _height| {
         // TODO: fix path handling, consider embedding the image directly into
         // the binary
         let image_surface =
@@ -63,11 +62,9 @@ pub fn create_badge_image() -> Image {
             108.0,
             8,
         );
-
-        return Inhibit(true);
     });
 
-    return image;
+    return drawing_area;
 }
 
 fn normalize_vendor_name(vendor_name: &String) -> Option<String> {

@@ -6,13 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gtk = "0.15.3"
-pango = "0.15.2"
-pangocairo = "0.15.1"
-libc = "0.2.116"
-sscanf = "0.1.4"
-lazy_static = "1.4.0"
+gtk4 = "0.10.1"
+pangocairo = "0.21.1"
+libc = "0.2.168"
+sscanf = "0.4.2"
+lazy_static = "1.5.0"
 
 [dependencies.cairo-rs]
-version = "0.15.1"
+version = "0.21.0"
 features = ["png"]

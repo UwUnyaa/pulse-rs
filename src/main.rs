@@ -1,6 +1,6 @@
-use gtk::glib::source;
-use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow};
+use gtk4::glib;
+use gtk4::prelude::*;
+use gtk4::{Application, ApplicationWindow};
 use std::time::Duration;
 
 pub mod badge;
@@ -33,14 +33,14 @@ fn main() {
 
         let mut interfaces = interface::init_interface(&window, &cpu_infos);
 
-        source::timeout_add_local(Duration::new(1, 0), move || {
+        glib::timeout_add_local(Duration::new(1, 0), move || {
             interface::update_usage_handler(&mut interfaces, &mut cpu_infos);
 
-            return source::Continue(true);
+            return glib::ControlFlow::Continue;
         });
 
         // show the window
-        window.show_all();
+        window.present();
     });
 
     app.run();
