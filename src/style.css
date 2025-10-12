@@ -1,0 +1,7 @@
+window > box {
+    padding: 8px;
+}
+
+progressbar, progressbar * {
+    min-height: 28px;
+}

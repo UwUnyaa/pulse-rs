@@ -36,6 +36,15 @@ pub fn init_interface(
 
     window.set_child(Some(&top_hbox));
 
+    let provider = gtk4::CssProvider::new();
+    provider.load_from_data(include_str!("style.css"));
+    let display = gtk4::gdk::Display::default().expect("Couldn't get default display");
+    gtk4::style_context_add_provider_for_display(
+        &display,
+        &provider,
+        gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
+
     let image = badge::create_badge_image();
     image.set_halign(Align::Start);
     image.set_valign(Align::Start);
