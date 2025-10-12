@@ -65,7 +65,6 @@ pub fn init_interface(
         let button = ToggleButton::with_label(&format!("{}", num_cpu));
         button.set_active(cpu_info.enabled);
 
-        // FIXME: progressbar doesn't have proper height
         let progress_bar = ProgressBar::new();
         progress_bar.set_fraction(cpu_info.usage);
 
