@@ -1,7 +1,7 @@
-use gtk;
-use gtk::glib;
-use gtk::prelude::{BoxExt, ContainerExt, ProgressBarExt, ToggleButtonExt, WidgetExt};
-use gtk::{Align, ApplicationWindow, Box, Orientation, ProgressBar, ToggleButton};
+use gtk4;
+use gtk4::glib;
+use gtk4::prelude::*;
+use gtk4::{Align, ApplicationWindow, Box, Orientation, ProgressBar, ToggleButton};
 
 use crate::badge;
 use crate::cpu;
@@ -16,7 +16,7 @@ pub struct CPUInterface {
 pub fn update_usage_handler(
     interfaces: &Vec<CPUInterface>,
     infos: &mut Vec<cpu::CPUInfo>,
-) -> glib::source::Continue {
+) -> glib::ControlFlow {
     cpu::get_cpu_stats(infos);
 
     for i in 0..infos.len() {
@@ -25,7 +25,7 @@ pub fn update_usage_handler(
         interfaces[i].usage_bar.set_fraction(usage);
     }
 
-    return glib::source::Continue(true);
+    return glib::ControlFlow::Continue;
 }
 
 pub fn init_interface(
@@ -34,16 +34,16 @@ pub fn init_interface(
 ) -> Vec<CPUInterface> {
     let top_hbox = Box::new(Orientation::Horizontal, BORDER_SIZE);
 
-    window.add(&top_hbox);
+    window.set_child(Some(&top_hbox));
 
     let image = badge::create_badge_image();
     image.set_halign(Align::Start);
     image.set_valign(Align::Start);
 
-    top_hbox.pack_start(&image, false, false, 0);
+    top_hbox.append(&image);
 
     let cpus_vbox = Box::new(Orientation::Vertical, 2 * BORDER_SIZE);
-    top_hbox.pack_start(&cpus_vbox, true, true, 0);
+    top_hbox.append(&cpus_vbox);
 
     let mut interfaces = Vec::with_capacity(cpu::MAX_CPUS as usize);
 
@@ -51,7 +51,7 @@ pub fn init_interface(
         let cpu_info = &cpu_infos[num_cpu];
 
         let hbox = Box::new(Orientation::Horizontal, BORDER_SIZE);
-        cpus_vbox.pack_start(&hbox, true, true, 0);
+        cpus_vbox.append(&hbox);
 
         let button = ToggleButton::with_label(&format!("{}", num_cpu));
         button.set_active(cpu_info.enabled);
@@ -60,8 +60,8 @@ pub fn init_interface(
         let progress_bar = ProgressBar::new();
         progress_bar.set_fraction(cpu_info.usage);
 
-        hbox.pack_start(&button, true, true, 0);
-        hbox.pack_start(&progress_bar, true, true, 0);
+        hbox.append(&button);
+        hbox.append(&progress_bar);
 
         interfaces.push(CPUInterface {
             toggle: button,

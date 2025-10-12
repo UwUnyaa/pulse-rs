@@ -71,9 +71,9 @@ pub fn parse_cpuinfo() -> HashMap<String, String> {
             break;
         }
 
-        let parsed = scanf!(line, "{/[^\\t]+/}{/\\t+: /}{}", String, String, String);
+        let parsed = scanf!(line, "{:/[^\\t]+/}{:/\\t+: /}{}", String, String, String);
 
-        if let Some((key, _, value)) = parsed {
+        if let Ok((key, _, value)) = parsed {
             map.insert(key, value);
         }
     }
