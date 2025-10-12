@@ -7,8 +7,22 @@ pub mod badge;
 pub mod cpu;
 pub mod interface;
 pub mod system;
+pub mod helper;
 
 fn main() {
+    if std::env::args().any(|arg| arg == "--helper") {
+        std::process::exit(helper::helper_loop());
+    }
+
+    let (mut helper_stdin, helper_stdout, _helper_handle) =
+        match helper::spawn_helper() {
+            Ok((stdin, stdout, handle)) => (Some(stdin), Some(stdout), Some(handle)),
+            Err(e) => {
+                println!("Didn't spawn escalated helper");
+                (None, None, None)
+            }
+        };
+
     let app = Application::builder().build();
 
     app.connect_activate(|app| {
