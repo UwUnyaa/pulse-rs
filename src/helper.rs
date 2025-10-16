@@ -9,12 +9,14 @@ pub fn spawn_helper() -> anyhow::Result<(ChildStdin, ChildStdout, std::thread::J
         .stdout(Stdio::piped())
         .spawn()?;
 
-    let stdin = child.stdin.take().ok_or_else(|| {
-        anyhow::anyhow!("Failed to open stdin for helper process")
-    })?;
-    let stdout = child.stdout.take().ok_or_else(|| {
-        anyhow::anyhow!("Failed to open stdout for helper process")
-    })?;
+    let stdin = child
+        .stdin
+        .take()
+        .ok_or_else(|| anyhow::anyhow!("Failed to open stdin for helper process"))?;
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| anyhow::anyhow!("Failed to open stdout for helper process"))?;
 
     let handle = std::thread::spawn(move || {
         // TODO: implement
