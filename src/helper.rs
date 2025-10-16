@@ -1,4 +1,11 @@
+use serde::{Deserialize, Serialize};
 use std::process::{ChildStdin, ChildStdout, Command, Stdio};
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum HelperRequest {
+    SetCPUEnableState { cpu_num: u32, enabled: bool },
+    Ping,
+}
 
 pub fn spawn_helper() -> anyhow::Result<(ChildStdin, ChildStdout, std::thread::JoinHandle<()>)> {
     let binary_path = std::env::current_exe()?;
