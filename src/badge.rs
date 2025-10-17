@@ -1,16 +1,17 @@
 use crate::cpu;
 
 use std::collections::HashMap;
+use std::io::Cursor;
 
 use gtk4::cairo::{Context as CairoContext, ImageSurface};
 use gtk4::pango::{Alignment, FontDescription};
 use gtk4::prelude::*;
 use gtk4::DrawingArea;
 use pangocairo::functions::{create_layout, show_layout, update_layout};
-use std::fs::File;
 
 const CPU_FREQUENCY_POWERS: [char; 4] = ['k', 'M', 'G', 'T'];
 const BADGE_SIZE: i32 = 128;
+const BADGE_IMAGE: &[u8] = include_bytes!("badge.png");
 
 fn draw_badge_text(cr: &CairoContext, label: &String, ypos: f64, font_size: i32) {
     let layout = create_layout(cr);
@@ -36,10 +37,8 @@ pub fn create_badge_image() -> DrawingArea {
     let cpu_stats = cpu::parse_cpuinfo();
 
     drawing_area.set_draw_func(move |_area, cr, _width, _height| {
-        // TODO: fix path handling, consider embedding the image directly into
-        // the binary
         let image_surface =
-            ImageSurface::create_from_png(&mut File::open("src/badge.png").unwrap()).unwrap();
+            ImageSurface::create_from_png(&mut Cursor::new(BADGE_IMAGE)).unwrap();
 
         // Draw the background image onto the surface
         cr.set_source_surface(&image_surface, 0.0, 0.0)
