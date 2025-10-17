@@ -14,11 +14,11 @@ fn main() {
         std::process::exit(helper::helper_loop());
     }
 
-    let (mut helper_stdin, helper_stdout, _helper_handle) = match helper::spawn_helper() {
-        Ok((stdin, stdout, handle)) => (Some(stdin), Some(stdout), Some(handle)),
+    let (mut helper_stdin, helper_stdout) = match helper::spawn_helper() {
+        Ok((stdin, stdout)) => (Some(stdin), Some(stdout)),
         Err(e) => {
             println!("Didn't spawn escalated helper");
-            (None, None, None)
+            (None, None)
         }
     };
 
