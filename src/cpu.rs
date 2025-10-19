@@ -106,6 +106,11 @@ pub fn set_cpu_enable_state(helper_io: helper::HelperIORef, nth_cpu: u32, enable
     }
 }
 
+pub fn is_cpu_toggleable(nth_cpu: u32) -> bool {
+    // If the file doesn't exist, the CPU is not toggleable
+    return fs::metadata(&format!("/sys/devices/system/cpu/cpu{}/online", nth_cpu)).is_ok();
+}
+
 pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
     let stat_contents =
         fs::read_to_string("/proc/stat").expect("Couldn't read processor stat file.");

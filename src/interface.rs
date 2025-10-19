@@ -69,13 +69,18 @@ pub fn init_interface(
 
         let button = ToggleButton::with_label(&format!("{}", num_cpu));
         button.set_active(cpu_info.enabled);
-        if let Some(ref io_ref) = io_option {
+
+        if cpu::is_cpu_toggleable(num_cpu as u32)
+            && let Some(ref io_ref) = io_option
+        {
             let io = io_ref.clone();
             let nth_cpu = num_cpu as u32;
             button.connect_toggled(move |btn| {
                 let enabled = btn.is_active();
                 cpu::set_cpu_enable_state(io.clone(), nth_cpu, enabled);
             });
+        } else {
+            button.set_sensitive(false);
         }
 
         let progress_bar = ProgressBar::new();
