@@ -2,7 +2,7 @@ use sscanf::scanf;
 use std::collections::HashMap;
 use std::fs;
 
-use crate::system;
+use crate::{helper, system};
 
 pub const MAX_CPUS: u32 = 256;
 
@@ -91,6 +91,19 @@ pub fn get_cpu_enable_state(nth_cpu: u32) -> bool {
     };
 
     return contents.chars().nth(0) == Some('1');
+}
+
+pub fn set_cpu_enable_state(helper_io: &mut helper::HelperIO, nth_cpu: u32, enabled: bool) -> bool {
+    match helper::send_helper_request(
+        helper_io,
+        &helper::HelperRequest::SetCPUEnableState {
+            cpu_num: nth_cpu,
+            enabled: enabled,
+        },
+    ) {
+        Ok(helper::HelperResponse::Ok) => true,
+        _ => false,
+    }
 }
 
 pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
