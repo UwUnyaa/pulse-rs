@@ -16,7 +16,12 @@ pub enum HelperResponse {
     Pong,
 }
 
-pub fn spawn_helper() -> anyhow::Result<(ChildStdin, ChildStdout)> {
+pub struct HelperIO {
+    pub stdin: ChildStdin,
+    pub stdout: ChildStdout,
+}
+
+pub fn spawn_helper() -> anyhow::Result<HelperIO> {
     let binary_path = std::env::current_exe()?;
     let mut child = Command::new("pkexec")
         .arg(binary_path)
@@ -35,7 +40,10 @@ pub fn spawn_helper() -> anyhow::Result<(ChildStdin, ChildStdout)> {
         .take()
         .ok_or_else(|| anyhow::anyhow!("failed to take child stdout"))?;
 
-    Ok((child_stdin, child_stdout))
+    Ok(HelperIO {
+        stdin: child_stdin,
+        stdout: child_stdout,
+    })
 }
 
 pub fn helper_loop() -> i32 {

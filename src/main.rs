@@ -14,13 +14,7 @@ fn main() {
         std::process::exit(helper::helper_loop());
     }
 
-    let (mut helper_stdin, helper_stdout) = match helper::spawn_helper() {
-        Ok((stdin, stdout)) => (Some(stdin), Some(stdout)),
-        Err(e) => {
-            println!("Didn't spawn escalated helper");
-            (None, None)
-        }
-    };
+    let helper_io = helper::spawn_helper();
 
     let app = Application::builder().build();
 
