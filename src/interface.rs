@@ -11,7 +11,6 @@ use crate::helper;
 const BORDER_SIZE: i32 = 4;
 
 pub struct CPUInterface {
-    toggle: ToggleButton,
     usage_bar: ProgressBar,
 }
 
@@ -90,7 +89,6 @@ pub fn init_interface(
         hbox.append(&progress_bar);
 
         interfaces.push(CPUInterface {
-            toggle: button,
             usage_bar: progress_bar,
         });
     }
