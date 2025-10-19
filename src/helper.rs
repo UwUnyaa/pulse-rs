@@ -86,3 +86,20 @@ pub fn helper_loop() -> i32 {
 
     0
 }
+
+pub fn send_helper_request(
+    stdin: &mut ChildStdin,
+    stdout: &mut ChildStdout,
+    request: &HelperRequest,
+) -> anyhow::Result<HelperResponse> {
+    let request_str = serde_json::to_string(request)?;
+    writeln!(stdin, "{}", request_str)?;
+
+    let mut reader = io::BufReader::new(stdout);
+    let mut response_line = String::new();
+    reader.read_line(&mut response_line)?;
+
+    let response: HelperResponse = serde_json::from_str(&response_line)?;
+
+    Ok(response)
+}
