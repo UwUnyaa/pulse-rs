@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
+use std::cell::RefCell;
 use std::process::{ChildStdin, ChildStdout};
 use std::process::{Command, Stdio};
+use std::rc::Rc;
 use std::{io, io::BufRead, io::BufReader, io::Write};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -21,7 +23,9 @@ pub struct HelperIO {
     pub stdout: BufReader<ChildStdout>,
 }
 
-pub fn spawn_helper() -> anyhow::Result<HelperIO> {
+pub type HelperIORef = Rc<RefCell<HelperIO>>;
+
+pub fn spawn_helper() -> anyhow::Result<HelperIORef> {
     let binary_path = std::env::current_exe()?;
     let mut child = Command::new("pkexec")
         .arg(binary_path)
@@ -40,10 +44,10 @@ pub fn spawn_helper() -> anyhow::Result<HelperIO> {
         .take()
         .ok_or_else(|| anyhow::anyhow!("failed to take child stdout"))?;
 
-    Ok(HelperIO {
+    Ok(Rc::new(RefCell::new(HelperIO {
         stdin: child_stdin,
         stdout: BufReader::new(child_stdout),
-    })
+    })))
 }
 
 pub fn helper_loop() -> i32 {
@@ -88,14 +92,15 @@ pub fn helper_loop() -> i32 {
 }
 
 pub fn send_helper_request(
-    helper_io: &mut HelperIO,
+    helper_io: HelperIORef,
     request: &HelperRequest,
 ) -> anyhow::Result<HelperResponse> {
+    let mut io = helper_io.borrow_mut();
     let request_str = serde_json::to_string(request)?;
-    writeln!(helper_io.stdin, "{}", request_str)?;
+    writeln!(io.stdin, "{}", request_str)?;
 
     let mut response_line = String::new();
-    helper_io.stdout.read_line(&mut response_line)?;
+    io.stdout.read_line(&mut response_line)?;
 
     let response: HelperResponse = serde_json::from_str(&response_line)?;
 
