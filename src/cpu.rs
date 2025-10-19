@@ -120,7 +120,10 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
     // skip the first line
     lines.next();
 
-    for cpu_info in cpu_infos {
+    for (nth_cpu, cpu_info) in cpu_infos.iter_mut().enumerate() {
+        let is_enabled = get_cpu_enable_state(nth_cpu as u32);
+        cpu_info.enabled = is_enabled;
+
         cpu_info.prev_stat = cpu_info.curr_stat.clone();
 
         let curr_stat = &mut cpu_info.curr_stat;
