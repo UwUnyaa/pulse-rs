@@ -93,7 +93,7 @@ pub fn get_cpu_enable_state(nth_cpu: u32) -> bool {
     return contents.chars().nth(0) == Some('1');
 }
 
-pub fn set_cpu_enable_state(helper_io: &mut helper::HelperIO, nth_cpu: u32, enabled: bool) -> bool {
+pub fn set_cpu_enable_state(helper_io: helper::HelperIORef, nth_cpu: u32, enabled: bool) -> bool {
     match helper::send_helper_request(
         helper_io,
         &helper::HelperRequest::SetCPUEnableState {
