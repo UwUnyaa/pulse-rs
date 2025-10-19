@@ -14,11 +14,11 @@ fn main() {
         std::process::exit(helper::helper_loop());
     }
 
-    let helper_io = helper::spawn_helper();
-
     let app = Application::builder().build();
 
-    app.connect_activate(|app| {
+    app.connect_activate(move |app| {
+        let helper_io = helper::spawn_helper();
+
         let window = ApplicationWindow::builder()
             .application(app)
             .title("Pulse")
@@ -35,7 +35,7 @@ fn main() {
             cpu::get_cpu_usage(&mut cpu_infos[i]);
         }
 
-        let mut interfaces = interface::init_interface(&window, &cpu_infos);
+        let mut interfaces = interface::init_interface(&window, &cpu_infos, helper_io);
 
         glib::timeout_add_local(Duration::new(1, 0), move || {
             interface::update_usage_handler(&mut interfaces, &mut cpu_infos);

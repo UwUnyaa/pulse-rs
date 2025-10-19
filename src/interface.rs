@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use anyhow;
 use gtk4;
 use gtk4::glib;
@@ -35,7 +33,7 @@ pub fn update_usage_handler(
 pub fn init_interface(
     window: &ApplicationWindow,
     cpu_infos: &Vec<cpu::CPUInfo>,
-    helper_io: Result<helper::HelperIORef, anyhow::Error>,
+    helper_io: anyhow::Result<helper::HelperIORef, anyhow::Error>,
 ) -> Vec<CPUInterface> {
     let top_hbox = Box::new(Orientation::Horizontal, BORDER_SIZE);
 
@@ -61,7 +59,7 @@ pub fn init_interface(
 
     let mut interfaces = Vec::with_capacity(cpu::MAX_CPUS as usize);
 
-    let helper_io = helper_io.ok();
+    let io_option = helper_io.ok();
 
     for num_cpu in 0..cpu_infos.len() {
         let cpu_info = &cpu_infos[num_cpu];
@@ -71,8 +69,8 @@ pub fn init_interface(
 
         let button = ToggleButton::with_label(&format!("{}", num_cpu));
         button.set_active(cpu_info.enabled);
-        if let Some(ref helper_io) = helper_io {
-            let io = Rc::clone(helper_io);
+        if let Some(ref io_ref) = io_option {
+            let io = io_ref.clone();
             let nth_cpu = num_cpu as u32;
             button.connect_toggled(move |btn| {
                 let enabled = btn.is_active();
