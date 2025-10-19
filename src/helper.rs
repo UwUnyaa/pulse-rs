@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::process::{ChildStdin, ChildStdout};
 use std::process::{Command, Stdio};
-use std::{io, io::BufRead, io::Write};
+use std::{io, io::BufRead, io::BufReader, io::Write};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum HelperRequest {
@@ -18,7 +18,7 @@ pub enum HelperResponse {
 
 pub struct HelperIO {
     pub stdin: ChildStdin,
-    pub stdout: ChildStdout,
+    pub stdout: BufReader<ChildStdout>,
 }
 
 pub fn spawn_helper() -> anyhow::Result<HelperIO> {
@@ -42,7 +42,7 @@ pub fn spawn_helper() -> anyhow::Result<HelperIO> {
 
     Ok(HelperIO {
         stdin: child_stdin,
-        stdout: child_stdout,
+        stdout: BufReader::new(child_stdout),
     })
 }
 
@@ -88,16 +88,14 @@ pub fn helper_loop() -> i32 {
 }
 
 pub fn send_helper_request(
-    stdin: &mut ChildStdin,
-    stdout: &mut ChildStdout,
+    helper_io: &mut HelperIO,
     request: &HelperRequest,
 ) -> anyhow::Result<HelperResponse> {
     let request_str = serde_json::to_string(request)?;
-    writeln!(stdin, "{}", request_str)?;
+    writeln!(helper_io.stdin, "{}", request_str)?;
 
-    let mut reader = io::BufReader::new(stdout);
     let mut response_line = String::new();
-    reader.read_line(&mut response_line)?;
+    helper_io.stdout.read_line(&mut response_line)?;
 
     let response: HelperResponse = serde_json::from_str(&response_line)?;
 
