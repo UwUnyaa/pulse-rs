@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use anyhow;
 use gtk4;
 use gtk4::glib;
 use gtk4::prelude::*;
@@ -34,7 +35,7 @@ pub fn update_usage_handler(
 pub fn init_interface(
     window: &ApplicationWindow,
     cpu_infos: &Vec<cpu::CPUInfo>,
-    helper_io: Result<helper::HelperIORef, ()>,
+    helper_io: Result<helper::HelperIORef, anyhow::Error>,
 ) -> Vec<CPUInterface> {
     let top_hbox = Box::new(Orientation::Horizontal, BORDER_SIZE);
 
