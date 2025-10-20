@@ -107,7 +107,7 @@ fn normalize_vendor_name(vendor_name: &String) -> Option<String> {
         return Some(name.to_string());
     }
 
-    // TODO: handle unknown vendors properly (espeically for non-x86 architectures)
+    // TODO: handle unknown vendors properly (especially for non-x86 architectures)
     return None;
 }
 
