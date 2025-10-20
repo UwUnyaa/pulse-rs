@@ -5,3 +5,7 @@ window > box {
 progressbar, progressbar * {
     min-height: 28px;
 }
+
+.badge {
+    margin-right: 8px;
+}

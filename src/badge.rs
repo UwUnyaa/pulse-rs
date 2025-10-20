@@ -30,8 +30,9 @@ fn draw_badge_text(cr: &CairoContext, label: &String, ypos: f64, font_size: i32)
 
 pub fn create_badge_image() -> DrawingArea {
     let drawing_area = DrawingArea::builder()
-        .width_request(BADGE_SIZE)
+        .width_request(BADGE_SIZE + 8)
         .height_request(BADGE_SIZE)
+        .css_classes(vec!["badge"])
         .build();
 
     let cpu_stats = cpu::parse_cpuinfo();
