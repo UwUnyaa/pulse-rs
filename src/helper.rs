@@ -51,8 +51,18 @@ pub fn spawn_helper() -> anyhow::Result<HelperIORef> {
 }
 
 fn send_helper_response(out: &mut impl Write, response: &HelperResponse) -> anyhow::Result<()> {
-    let response_str = serde_json::to_string(response)?;
+    let response_str = match serde_json::to_string(response) {
+        Ok(s) => s,
+        Err(e) => {
+            return Err(anyhow::anyhow!(
+                "Failed to serialize helper response: {}",
+                e
+            ));
+        }
+    };
+
     writeln!(out, "{}", response_str)?;
+
     Ok(())
 }
 
