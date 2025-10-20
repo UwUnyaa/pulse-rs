@@ -9,7 +9,6 @@ pub const MAX_CPUS: u32 = 256;
 pub const SYS_CPU_DEVICES: &str = "/sys/devices/system/cpu";
 pub const PROC_STAT: &str = "/proc/stat";
 pub const PROC_CPUINFO: &str = "/proc/cpuinfo";
-pub const CPU0_CPUFREQ_MAX: &str = "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq";
 
 fn cpu_online_path(nth_cpu: u32) -> String {
     format!("{}/cpu{}/online", SYS_CPU_DEVICES, nth_cpu)
@@ -56,16 +55,29 @@ pub fn get_cpu_count() -> u32 {
     return count;
 }
 
-pub fn get_cpu_max_frequency() -> u32 {
-    let contents = fs::read_to_string(CPU0_CPUFREQ_MAX).expect("Cannot read cpu frequency file");
+pub fn get_cpu_max_frequency(cpu_count: u32) -> u32 {
+    let mut highest_frequency = 0;
 
-    let line = contents.lines().next();
+    for cpu_num in 0..cpu_count {
+        let contents = fs::read_to_string(format!(
+            "/sys/devices/system/cpu/cpu{}/cpufreq/cpuinfo_max_freq",
+            cpu_num
+        ))
+        .expect("Cannot read cpu frequency file");
 
-    if let Some(frequency) = line {
-        return frequency.parse::<u32>().expect("Malformed frequency");
-    } else {
-        panic!("Reading the line failed");
+        let line = contents.lines().next();
+
+        if let Some(frequency) = line {
+            let cpu_frequency = frequency.parse::<u32>().expect("Malformed frequency");
+            if cpu_frequency > highest_frequency {
+                highest_frequency = cpu_frequency;
+            }
+        } else {
+            panic!("Reading the line failed");
+        }
     }
+
+    highest_frequency
 }
 
 pub fn parse_cpuinfo() -> HashMap<String, String> {

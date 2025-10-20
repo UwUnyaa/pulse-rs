@@ -56,7 +56,7 @@ pub fn create_badge_image() -> DrawingArea {
         draw_badge_text(cr, cpu_stats.get("model name").unwrap(), 40.0, 8);
         draw_badge_text(
             cr,
-            &normalize_cpu_frequency(cpu::get_cpu_max_frequency()),
+            &normalize_cpu_frequency(cpu::get_cpu_max_frequency(cpu::get_cpu_count())),
             108.0,
             8,
         );
