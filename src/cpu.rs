@@ -123,7 +123,7 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
 
     let mut lines = stat_contents.lines();
 
-    // skip the first line
+    // skip the first line, it contains the CPU usage summary
     lines.next();
 
     for (nth_cpu, cpu_info) in cpu_infos.iter_mut().enumerate() {
