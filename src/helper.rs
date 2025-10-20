@@ -64,7 +64,15 @@ pub fn helper_loop() -> i32 {
     let mut out = stdout.lock();
 
     for line in reader.lines() {
-        let req: HelperRequest = match serde_json::from_str(&line.unwrap()) {
+        let line = match line {
+            Ok(l) => l,
+            Err(e) => {
+                eprintln!("Failed to read line from stdin: {}", e);
+                continue;
+            }
+        };
+
+        let req: HelperRequest = match serde_json::from_str(&line) {
             Ok(req) => req,
             Err(e) => {
                 eprintln!("Failed to parse helper request: {}", e);
