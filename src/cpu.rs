@@ -98,7 +98,7 @@ pub fn set_cpu_enable_state(helper_io: helper::HelperIORef, nth_cpu: u32, enable
         helper_io,
         &helper::HelperRequest::SetCPUEnableState {
             cpu_num: nth_cpu,
-            enabled: enabled,
+            enabled,
         },
     ) {
         Ok(helper::HelperResponse::Ok) => true,
