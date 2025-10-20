@@ -93,8 +93,6 @@ pub fn get_cpu_enable_state(nth_cpu: u32) -> bool {
     let file_name = cpu_online_path(nth_cpu);
     let contents = match fs::read_to_string(&file_name) {
         Ok(content) => content,
-        // Assume CPU is enabled if online file doesn't exist
-        // FIXME: match a proper error here
         Err(_) => return true,
     };
 
