@@ -6,6 +6,15 @@ use crate::{helper, system};
 
 pub const MAX_CPUS: u32 = 256;
 
+pub const SYS_CPU_DEVICES: &str = "/sys/devices/system/cpu";
+pub const PROC_STAT: &str = "/proc/stat";
+pub const PROC_CPUINFO: &str = "/proc/cpuinfo";
+pub const CPU0_CPUFREQ_MAX: &str = "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq";
+
+fn cpu_online_path(nth_cpu: u32) -> String {
+    format!("{}/cpu{}/online", SYS_CPU_DEVICES, nth_cpu)
+}
+
 #[derive(Clone, Debug)]
 pub struct CPUStat {
     pub user: u32,
@@ -32,7 +41,7 @@ pub fn get_cpu_count() -> u32 {
     let mut count: u32 = 1;
 
     loop {
-        let dir_name = format!("/sys/devices/system/cpu/cpu{}", count);
+        let dir_name = format!("{}/cpu{}", SYS_CPU_DEVICES, count);
         if system::directory_exists(&dir_name) {
             count += 1;
         } else {
@@ -48,8 +57,7 @@ pub fn get_cpu_count() -> u32 {
 }
 
 pub fn get_cpu_max_frequency() -> u32 {
-    let contents = fs::read_to_string("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq")
-        .expect("Cannot read cpu frequency file");
+    let contents = fs::read_to_string(CPU0_CPUFREQ_MAX).expect("Cannot read cpu frequency file");
 
     let line = contents.lines().next();
 
@@ -63,7 +71,7 @@ pub fn get_cpu_max_frequency() -> u32 {
 pub fn parse_cpuinfo() -> HashMap<String, String> {
     let mut map = HashMap::new();
 
-    let contents = fs::read_to_string("/proc/cpuinfo").expect("Cannot read cpuinfo file.");
+    let contents = fs::read_to_string(PROC_CPUINFO).expect("Cannot read cpuinfo file.");
 
     for line in contents.lines() {
         // Ignore info about CPUs other than the first one
@@ -82,7 +90,7 @@ pub fn parse_cpuinfo() -> HashMap<String, String> {
 }
 
 pub fn get_cpu_enable_state(nth_cpu: u32) -> bool {
-    let file_name = format!("/sys/devices/system/cpu/cpu{}/online", nth_cpu);
+    let file_name = cpu_online_path(nth_cpu);
     let contents = match fs::read_to_string(&file_name) {
         Ok(content) => content,
         // Assume CPU is enabled if online file doesn't exist
@@ -108,7 +116,7 @@ pub fn set_cpu_enable_state(helper_io: helper::HelperIORef, nth_cpu: u32, enable
 
 pub fn is_cpu_toggleable(nth_cpu: u32) -> bool {
     // If the file doesn't exist, the CPU is not toggleable
-    return fs::metadata(&format!("/sys/devices/system/cpu/cpu{}/online", nth_cpu)).is_ok();
+    return fs::metadata(&cpu_online_path(nth_cpu)).is_ok();
 }
 
 pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
