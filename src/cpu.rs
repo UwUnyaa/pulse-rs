@@ -124,6 +124,11 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
         let is_enabled = get_cpu_enable_state(nth_cpu as u32);
         cpu_info.enabled = is_enabled;
 
+        if !is_enabled {
+            // /proc/stat doesn't report stats of offline CPUs
+            continue;
+        }
+
         cpu_info.prev_stat = cpu_info.curr_stat.clone();
 
         let curr_stat = &mut cpu_info.curr_stat;
