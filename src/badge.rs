@@ -3,10 +3,10 @@ use crate::cpu;
 use std::collections::HashMap;
 use std::io::Cursor;
 
+use gtk4::DrawingArea;
 use gtk4::cairo::{Context as CairoContext, ImageSurface};
 use gtk4::pango::{Alignment, FontDescription};
 use gtk4::prelude::*;
-use gtk4::DrawingArea;
 use pangocairo::functions::{create_layout, show_layout, update_layout};
 
 const CPU_FREQUENCY_POWERS: [char; 4] = ['k', 'M', 'G', 'T'];
@@ -37,8 +37,7 @@ pub fn create_badge_image() -> DrawingArea {
     let cpu_stats = cpu::parse_cpuinfo();
 
     drawing_area.set_draw_func(move |_area, cr, _width, _height| {
-        let image_surface =
-            ImageSurface::create_from_png(&mut Cursor::new(BADGE_IMAGE)).unwrap();
+        let image_surface = ImageSurface::create_from_png(&mut Cursor::new(BADGE_IMAGE)).unwrap();
 
         // Draw the background image onto the surface
         cr.set_source_surface(&image_surface, 0.0, 0.0)
@@ -67,7 +66,7 @@ pub fn create_badge_image() -> DrawingArea {
 }
 
 fn normalize_vendor_name(vendor_name: &String) -> Option<String> {
-    // FIXME: make this cleaner, an external crate might be necessary to store
+    // TODO: make this cleaner, an external crate might be necessary to store
     // a compile-time hash table
     let vendor_map = HashMap::from([
         ("AMDisbetter!".to_string(), "AMD".to_string()),
@@ -108,6 +107,7 @@ fn normalize_vendor_name(vendor_name: &String) -> Option<String> {
         return Some(name.to_string());
     }
 
+    // TODO: handle unknown vendors properly (especially for non-x86 architectures)
     return None;
 }
 
@@ -120,6 +120,8 @@ fn normalize_cpu_frequency(frequency: u32) -> String {
         powers += 1;
     }
 
+    // TODO: handle extremely high frequencies properly, currently they will
+    // get reported as kHz but the number will be actually Hz
     if powers > CPU_FREQUENCY_POWERS.len() {
         result_frequency = f64::from(frequency);
         powers = 0;

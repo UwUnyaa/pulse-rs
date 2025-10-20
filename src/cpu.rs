@@ -2,7 +2,7 @@ use sscanf::scanf;
 use std::collections::HashMap;
 use std::fs;
 
-use crate::system;
+use crate::{helper, system};
 
 pub const MAX_CPUS: u32 = 256;
 
@@ -93,6 +93,24 @@ pub fn get_cpu_enable_state(nth_cpu: u32) -> bool {
     return contents.chars().nth(0) == Some('1');
 }
 
+pub fn set_cpu_enable_state(helper_io: helper::HelperIORef, nth_cpu: u32, enabled: bool) -> bool {
+    match helper::send_helper_request(
+        helper_io,
+        &helper::HelperRequest::SetCPUEnableState {
+            cpu_num: nth_cpu,
+            enabled,
+        },
+    ) {
+        Ok(helper::HelperResponse::Ok) => true,
+        _ => false,
+    }
+}
+
+pub fn is_cpu_toggleable(nth_cpu: u32) -> bool {
+    // If the file doesn't exist, the CPU is not toggleable
+    return fs::metadata(&format!("/sys/devices/system/cpu/cpu{}/online", nth_cpu)).is_ok();
+}
+
 pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
     let stat_contents =
         fs::read_to_string("/proc/stat").expect("Couldn't read processor stat file.");
@@ -102,7 +120,15 @@ pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
     // skip the first line
     lines.next();
 
-    for cpu_info in cpu_infos {
+    for (nth_cpu, cpu_info) in cpu_infos.iter_mut().enumerate() {
+        let is_enabled = get_cpu_enable_state(nth_cpu as u32);
+        cpu_info.enabled = is_enabled;
+
+        if !is_enabled {
+            // /proc/stat doesn't report stats of offline CPUs
+            continue;
+        }
+
         cpu_info.prev_stat = cpu_info.curr_stat.clone();
 
         let curr_stat = &mut cpu_info.curr_stat;
