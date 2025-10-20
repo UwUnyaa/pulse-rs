@@ -118,8 +118,7 @@ pub fn is_cpu_toggleable(nth_cpu: u32) -> bool {
 }
 
 pub fn get_cpu_stats(cpu_infos: &mut Vec<CPUInfo>) {
-    let stat_contents =
-        fs::read_to_string("/proc/stat").expect("Couldn't read processor stat file.");
+    let stat_contents = fs::read_to_string(PROC_STAT).expect("Couldn't read processor stat file.");
 
     let mut lines = stat_contents.lines();
 
