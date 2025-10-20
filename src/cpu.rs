@@ -62,9 +62,9 @@ pub fn get_cpu_max_frequency() -> u32 {
     let line = contents.lines().next();
 
     if let Some(frequency) = line {
-        return frequency.parse::<u32>().unwrap();
+        return frequency.parse::<u32>().expect("Malformed frequency");
     } else {
-        panic!("Malformed frequency");
+        panic!("Reading the line failed");
     }
 }
 
