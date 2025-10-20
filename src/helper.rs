@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
-use std::process::{ChildStdin, ChildStdout};
+use std::process::{Child, ChildStdin, ChildStdout};
 use std::process::{Command, Stdio};
 use std::rc::Rc;
 use std::{io, io::BufRead, io::BufReader, io::Write};
@@ -21,6 +21,16 @@ pub enum HelperResponse {
 pub struct HelperIO {
     pub stdin: ChildStdin,
     pub stdout: BufReader<ChildStdout>,
+    pub child: Child,
+}
+
+impl Drop for HelperIO {
+    fn drop(&mut self) {
+        if let Err(e) = self.child.kill() {
+            eprintln!("Failed to kill helper process: {}", e);
+        }
+        let _ = self.child.wait();
+    }
 }
 
 pub type HelperIORef = Rc<RefCell<HelperIO>>;
@@ -47,6 +57,7 @@ pub fn spawn_helper() -> anyhow::Result<HelperIORef> {
     Ok(Rc::new(RefCell::new(HelperIO {
         stdin: child_stdin,
         stdout: BufReader::new(child_stdout),
+        child,
     })))
 }
 
