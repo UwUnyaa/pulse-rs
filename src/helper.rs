@@ -50,6 +50,12 @@ pub fn spawn_helper() -> anyhow::Result<HelperIORef> {
     })))
 }
 
+fn send_helper_response(out: &mut impl Write, response: &HelperResponse) -> anyhow::Result<()> {
+    let response_str = serde_json::to_string(response)?;
+    writeln!(out, "{}", response_str)?;
+    Ok(())
+}
+
 pub fn helper_loop() -> i32 {
     let stdin = io::stdin();
     let stdout = io::stdout();
@@ -70,20 +76,13 @@ pub fn helper_loop() -> i32 {
                 let path = format!("/sys/devices/system/cpu/cpu{}/online", cpu_num);
                 if let Err(e) = std::fs::write(&path, if enabled { "1" } else { "0" }) {
                     eprintln!("Failed to set CPU {} state: {}", cpu_num, e);
-                    let _ =
-                        serde_json::to_string(&HelperResponse::Error(e.to_string())).map(|resp| {
-                            writeln!(out, "{}", resp).unwrap();
-                        });
-                    continue;
+                    let _ = send_helper_response(&mut out, &HelperResponse::Error(e.to_string()));
+                } else {
+                    let _ = send_helper_response(&mut out, &HelperResponse::Ok);
                 }
-                let _ = serde_json::to_string(&HelperResponse::Ok).map(|resp| {
-                    writeln!(out, "{}", resp).unwrap();
-                });
             }
             HelperRequest::Ping => {
-                let _ = serde_json::to_string(&HelperResponse::Pong).map(|resp| {
-                    writeln!(out, "{}", resp).unwrap();
-                });
+                let _ = send_helper_response(&mut out, &HelperResponse::Pong);
             }
         }
     }
