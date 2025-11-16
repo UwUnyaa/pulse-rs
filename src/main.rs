@@ -19,6 +19,17 @@ fn main() {
     app.connect_activate(move |app| {
         let helper_io = helper::spawn_helper();
 
+        if let Ok(io) = helper_io.as_ref() {
+            // Cloning twice is required to satisfy trait bounds here
+            let helper_for_shutdown = io.clone();
+            app.connect_shutdown(move |_| {
+                let _ = helper::send_helper_request(
+                    helper_for_shutdown.clone(),
+                    &helper::HelperRequest::Exit,
+                );
+            });
+        }
+
         let window = ApplicationWindow::builder()
             .application(app)
             .title("Pulse")

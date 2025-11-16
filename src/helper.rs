@@ -8,6 +8,7 @@ use std::{io, io::BufRead, io::BufReader, io::Write};
 #[derive(Serialize, Deserialize, Debug)]
 pub enum HelperRequest {
     SetCPUEnableState { cpu_num: u32, enabled: bool },
+    Exit,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -107,6 +108,10 @@ pub fn helper_loop() -> i32 {
                 } else {
                     let _ = send_helper_response(&mut out, &HelperResponse::Ok);
                 }
+            }
+            HelperRequest::Exit => {
+                let _ = send_helper_response(&mut out, &HelperResponse::Ok);
+                return 0;
             }
         }
     }
